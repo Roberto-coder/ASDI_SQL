@@ -37,4 +37,7 @@ public class Token {
     public String getLexema(){
         return lexema;
     }
+
+
+
 }
