@@ -16,7 +16,7 @@ public class AnalisadorSDI {
 
     public AnalisadorSDI(List<Token> tokens){
         this.tokens = tokens;
-        preanalisis = this.tokens.get(i);
+        //preanalisis = this.tokens.get(i);
             // Definir las producciones para la gramática de SQL
             producciones.put("Q", new String[]{"select D from T"});
             producciones.put("D", new String[]{"distinct P", "P"});
@@ -35,30 +35,68 @@ public class AnalisadorSDI {
 
     public boolean analizarEntrada() {
         //Definir Pila
-        a=tokens.get(ip);
+
         Stack<String> pila = new Stack<>();
         pila.push("$");
         pila.push("Q");
-
         String X = pila.pop();
 
+        int flag;
+        String[] produccion_correcta;
         while(!X.equals("$")){//La pila no esta vacia
-            if(a.equals(X)){/*X.equals(tokens.get(i))   Si X es a*/
+            flag=0;
+            a=tokens.get(ip);
+            System.out.println("X:"+X+" a:"+a.getLexema());
+
+            if(X.equals(a.getLexema())){/*X.equals(tokens.get(i))   Si X es a*/
+                //System.out.println(X+"="+a.getLexema());
                 ip++;
-            }else if(a.equals(TipoToken)){//si a es un terminal
-                return false; // Error de sintaxis
-            }else if(tabla.get(X).get(a.getLexema()) == "ERROR"){
+            }else if(X.equals("")){
 
-            }else if(producciones.containsKey(tabla.get(X).get(a.getLexema()))){
-
-            }else{
+            }else if(this.EsTerminal(X)){//X es un terminal
+                System.out.println("ERROR1");
                 return false; // Error de sintaxis
+            }else if((tabla.get(X).get(a.getLexema())).equals("ERROR")){
+                System.out.println("ERROR2");
+                return false; // Error de sintaxis
+            }else if(!tabla.get(X).get(a.getLexema()).equals("ERROR")){
+                produccion_correcta=producciones.get(X)[0].split(" ");
+                if(producciones.get(X).length > 1 /*&& !X.equals(a.getLexema())*/){
+                    if(produccion_correcta[0].equals(a.getLexema())){
+                        flag=0;
+                    }else {
+                        flag=1;
+                    }
+                }else{
+                    flag=0;
+                }
+                String[] nuevo_elem=producciones.get(X)[flag].split(" ");
+                System.out.println("Salida: "+X+"->"+producciones.get(X)[flag]);
+                for(int i=0; i < nuevo_elem.length; i++){
+                    //System.out.println(nuevo_elem[nuevo_elem.length-i-1]);
+                    pila.push(nuevo_elem[nuevo_elem.length-i-1]);
+                }
             }
             X = pila.pop();
         }
 
         return true; // Éxito en el análisis sintáctico
     }
+
+    public boolean EsTerminal(String elem){
+
+        /*Scanner scanner = new Scanner(source);//Detecta los no terminales como id
+        List<Token> tokens = scanner.scanTokens();*/
+        String[] palabras_reservadas = {"Q", "D", "P", "A", "A1", "A2", "A3", "T", "T1", "T2", "T3"};
+
+        for(int i=0;i<palabras_reservadas.length;i++){
+            if(elem.equals(palabras_reservadas[i])){
+                return false;
+            }
+        }
+        return true;
+    }
+
 
     /*public boolean esTerminal(String caracter){
         for (){
