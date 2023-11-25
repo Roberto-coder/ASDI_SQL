@@ -19,7 +19,7 @@ public class AnalisadorSDI {
         //preanalisis = this.tokens.get(i);
             // Definir las producciones para la gramática de SQL
             producciones.put("Q", new String[]{"select D from T"});
-            producciones.put("D", new String[]{"distinct P", "P"});
+            producciones.put("D", new String[]{"distinct  P", "P"});
             producciones.put("P", new String[]{"*", "A"});
             producciones.put("A", new String[]{"A2 A1"});
             producciones.put("A1", new String[]{", A", ""});
@@ -42,27 +42,32 @@ public class AnalisadorSDI {
         String X = pila.pop();
 
         int flag;
+        String var_a="";
         String[] produccion_correcta;
         while(!X.equals("$")){//La pila no esta vacia
             flag=0;
             a=tokens.get(ip);
+            var_a=a.getLexema();
             System.out.println("X:"+X+" a:"+a.getLexema());
+            if(this.esID(a.getLexema())){
+                var_a="id";
+            }
 
-            if(X.equals(a.getLexema())){/*X.equals(tokens.get(i))   Si X es a*/
+            if(X.equals(var_a)){/*X.equals(tokens.get(i))   Si X es a*/
                 //System.out.println(X+"="+a.getLexema());
                 ip++;
-            }else if(X.equals("")){
+            }else if(X.equals("")){//X es epsilon
 
             }else if(this.EsTerminal(X)){//X es un terminal
                 System.out.println("ERROR1");
                 return false; // Error de sintaxis
-            }else if((tabla.get(X).get(a.getLexema())).equals("ERROR")){
+            }else if((tabla.get(X).get(var_a)).equals("ERROR")){//M[x,a] es error
                 System.out.println("ERROR2");
                 return false; // Error de sintaxis
-            }else if(!tabla.get(X).get(a.getLexema()).equals("ERROR")){
+            }else if(!tabla.get(X).get(var_a).equals("ERROR")){//M[x,a] = X -> Y1Y2...Yk
                 produccion_correcta=producciones.get(X)[0].split(" ");
                 if(producciones.get(X).length > 1 /*&& !X.equals(a.getLexema())*/){
-                    if(produccion_correcta[0].equals(a.getLexema())){
+                    if(produccion_correcta[0].equals(var_a)){
                         flag=0;
                     }else {
                         flag=1;
@@ -97,16 +102,18 @@ public class AnalisadorSDI {
         return true;
     }
 
+    public boolean esID(String elem){
 
-    /*public boolean esTerminal(String caracter){
-        for (){
-            if(caracter==){
+        /*Scanner scanner = new Scanner(source);//Detecta los no terminales como id
+        List<Token> tokens = scanner.scanTokens();*/
+        String[] palabras_reservadas = {"select", "from", ",", "distinct", "*", "$", "."};
 
+        for(int i=0;i<palabras_reservadas.length;i++){
+            if(elem.equals(palabras_reservadas[i])){
+                return false;
             }
         }
-
-        tokens.get()
-    }*/
-
+        return true;
+    }
 
 }

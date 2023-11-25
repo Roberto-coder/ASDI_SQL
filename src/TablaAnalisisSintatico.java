@@ -31,7 +31,7 @@ public class TablaAnalisisSintatico {
         fila.put("id", valores[0]);
         fila.put(",", valores[1]);
         fila.put("select", valores[2]);
-        fila.put("dinstict", valores[3]);
+        fila.put("distinct", valores[3]);
         fila.put("from", valores[4]);
         fila.put("*", valores[5]);
         fila.put(".", valores[6]);
